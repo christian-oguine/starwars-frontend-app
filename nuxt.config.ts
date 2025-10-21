@@ -13,7 +13,7 @@ export default defineNuxtConfig({
 
   googleFonts: {
     families: {
-      Audiowide: true,
+      Poppins: true,
       'Cinzel Decorative': [400, 700]
     },
     display: 'swap',

@@ -1,5 +1,5 @@
 <template>
-  <div class="font-cinzel container mx-auto p-4">
+  <div class="font-cinzel container mx-auto p-2">
     <NuxtPage />
   </div>
 </template>

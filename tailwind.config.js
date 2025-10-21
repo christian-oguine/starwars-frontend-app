@@ -24,7 +24,7 @@ export default {
       },
       fontFamily: {
         cinzel: ['"Cinzel Decorative"', 'serif'],
-        audiowide: ['Audiowide', 'cursive'],
+        poppins: ['"Poppins"', 'sans-serif'],
       },
       container: {
         center: true,
