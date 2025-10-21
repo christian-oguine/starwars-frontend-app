@@ -1,7 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
+  ssr: true, // ✅ Make sure SSR is enabled
   devtools: { enabled: true },
+  
   modules: [
     '@nuxtjs/tailwindcss',
     '@nuxtjs/google-fonts',
@@ -11,13 +13,10 @@ export default defineNuxtConfig({
 
   googleFonts: {
     families: {
-    'Cinzel Decorative': [400, 700],
-    'Lato': [400, 700, 900]
+      Audiowide: true,
+      'Cinzel Decorative': [400, 700]
     },
     display: 'swap',
-    preconnect: true,
-    prefetch: true,
-    preload: true,
     download: true
-  }
+  },
 })
