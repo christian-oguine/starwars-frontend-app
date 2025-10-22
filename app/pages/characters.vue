@@ -13,9 +13,7 @@
 
 <script setup lang="ts">
 
-  const {data, error} = useAsyncData('characters', () =>
-    $fetch('https://akabab.github.io/starwars-api/api/all.json')
-  )
+  const {data, error} = await useFetch('https://akabab.github.io/starwars-api/api/all.json');
 
   console.log(data.value)
  
