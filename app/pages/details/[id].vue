@@ -91,7 +91,77 @@
           </div>
         </aside>
 
+        <!-- RIGHT: Details -->
+        <main class="space-y-6">
+          <!-- Title block -->
+          <header class="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+            <h1 class="font-cinzel text-3xl leading-tight">{{ character.name }}</h1>
+            <p v-if="subtitle" class="mt-1 text-sm text-white/60 font-poppins">{{ subtitle }}</p>
+          </header>
 
+          <!-- Stats (clean 2x2) -->
+          <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="stat-card">
+              <p class="stat-label">
+                <Icon name="ph:ruler-duotone" class="mr-1 inline h-4 w-4" /> Height
+              </p>
+              <p class="stat-value">{{ character.height ?? '—' }}</p>
+            </div>
+            <div class="stat-card">
+              <p class="stat-label">
+                <Icon name="ph:scales-duotone" class="mr-1 inline h-4 w-4" /> Mass
+              </p>
+              <p class="stat-value">{{ character.mass ?? '—' }}</p>
+            </div>
+            <div class="stat-card">
+              <p class="stat-label">
+                <Icon name="ph:baby-duotone" class="mr-1 inline h-4 w-4" /> Born
+              </p>
+              <p class="stat-value">{{ character.born ?? '—' }}</p>
+            </div>
+            <div class="stat-card">
+              <p class="stat-label">
+                <Icon name="ph:skull-duotone" class="mr-1 inline h-4 w-4" /> Died
+              </p>
+              <p class="stat-value">{{ character.died ?? '—' }}</p>
+            </div>
+          </section>
+
+          <!-- Affiliations / Masters (two tidy cards) -->
+          <section class="grid md:grid-cols-2 gap-4">
+            <div v-if="hasAffiliations" class="panel">
+              <h3 class="panel-title">
+                <Icon name="ph:users-three-duotone" class="mr-2 inline h-5 w-5 text-gold" />
+                Affiliations
+              </h3>
+              <ul class="list">
+                <li v-for="(a,i) in character.affiliations" :key="i">{{ a }}</li>
+              </ul>
+            </div>
+
+            <div v-if="hasMasters" class="panel">
+              <h3 class="panel-title">
+                <Icon name="ph:sword-duotone" class="mr-2 inline h-5 w-5 text-gold" />
+                Masters
+              </h3>
+              <ul class="list">
+                <li v-for="(m,i) in character.masters" :key="i">{{ m }}</li>
+              </ul>
+            </div>
+          </section>
+
+          <!-- About -->
+          <section class="panel">
+            <h3 class="panel-title">
+              <Icon name="ph:info-duotone" class="mr-2 inline h-5 w-5 text-gold" />
+              About
+            </h3>
+            <p class="font-poppins text-white/80 leading-relaxed">
+              Replace this placeholder with a bio or summary from your backend. You
+              can also add tabs for “Appearances” and “Ships” later.
+            </p>
+          </section>
+        </main>
       </div>
     </section>
   </div>
