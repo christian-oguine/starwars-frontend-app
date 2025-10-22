@@ -20,7 +20,7 @@
       class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"
     >
       <article
-        v-for="c in (data || [])"
+        v-for="c in paginatedCharacters"
         :key="c.id"
         class="bg-white/[0.04] border border-white/10 rounded-2xl overflow-hidden hover:shadow-lg transition"
       >
@@ -47,18 +47,83 @@
         </footer>
       </article>
     </div>
+
+    <!-- Pagination -->
+    <div v-if="!error && totalPages > 1" class="mt-10 flex items-center justify-center gap-2">
+      <!-- Previous Button -->
+      <button
+        @click="currentPage--"
+        :disabled="currentPage === 1"
+        class="px-4 py-2 rounded-lg bg-white/[0.04] border border-white/10 font-poppins text-sm
+               hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition"
+      >
+        Previous
+      </button>
+
+      <!-- Page Numbers -->
+      <button
+        v-for="page in displayedPages"
+        :key="page"
+        @click="currentPage = page"
+        :class="[
+          'px-4 py-2 rounded-lg border font-poppins text-sm transition',
+          currentPage === page
+            ? 'bg-gold text-[#0f1318] border-gold font-semibold'
+            : 'bg-white/[0.04] border-white/10 hover:bg-white/10'
+        ]"
+      >
+        {{ page }}
+      </button>
+
+      <!-- Next Button -->
+      <button
+        @click="currentPage++"
+        :disabled="currentPage === totalPages"
+        class="px-4 py-2 rounded-lg bg-white/[0.04] border border-white/10 font-poppins text-sm
+               hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition"
+      >
+        Next
+      </button>
+    </div>
   </section>
-
-
-
-
   </div>
 </template>
 
 <script setup lang="ts">
-
   const {data, error} = await useFetch('https://akabab.github.io/starwars-api/api/all.json');
 
-  console.log(data.value)
- 
+  // Pagination state
+  const currentPage = ref(1);
+  const itemsPerPage = 12;
+
+  // Computed properties
+  const totalPages = computed(() => {
+    if (!data.value) return 0;
+    return Math.ceil(data.value.length / itemsPerPage);
+  });
+
+  const paginatedCharacters = computed(() => {
+    if (!data.value) return [];
+    const start = (currentPage.value - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    return data.value.slice(start, end);
+  });
+
+  const displayedPages = computed(() => {
+    const pages = [];
+    const maxVisible = 5;
+    let startPage = Math.max(1, currentPage.value - Math.floor(maxVisible / 2));
+    let endPage = Math.min(totalPages.value, startPage + maxVisible - 1);
+
+    if (endPage - startPage < maxVisible - 1) {
+      startPage = Math.max(1, endPage - maxVisible + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    return pages;
+  });
+
+  console.log(data.value);
 </script>
