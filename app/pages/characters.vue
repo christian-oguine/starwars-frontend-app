@@ -109,45 +109,46 @@
 <script setup lang="ts">
   const {data, error} = await useFetch('https://akabab.github.io/starwars-api/api/all.json');
 
-
   // Search state
   const searchQuery = ref('');
-
-  const handleCharacterSearch = () => {
-    if (!data.value) return;
-
-    const query = searchQuery.value.trim().toLowerCase();
-    if (query === '') {
-      // If search query is empty, reload all characters
-      return;
-    }
-
-    // Filter characters by name
-    data.value = data.value.filter((character: any) =>
-      character.name.toLowerCase().includes(query)
-    );
-
-    // Reset to first page after search
-    currentPage.value = 1;
-  };
-
   
-
   // Pagination state
   const currentPage = ref(1);
   const itemsPerPage = 12;
 
+  // Filtered characters (computed - doesn't mutate original data)
+  const filteredCharacters = computed(() => {
+    if (!data.value) return [];
+    
+    const query = searchQuery.value.trim().toLowerCase();
+    if (query === '') return data.value;
+
+    return data.value.filter((character: any) =>
+      character.name.toLowerCase().includes(query)
+    );
+  });
+
+  // Handle search button click
+  const handleCharacterSearch = () => {
+    currentPage.value = 1; // Reset to first page on search
+  };
+
+  // Watch for empty search to reset page
+  watch(searchQuery, (newValue) => {
+    if (newValue.trim() === '') {
+      currentPage.value = 1;
+    }
+  });
+
   // Computed properties
   const totalPages = computed(() => {
-    if (!data.value) return 0;
-    return Math.ceil(data.value.length / itemsPerPage);
+    return Math.ceil(filteredCharacters.value.length / itemsPerPage);
   });
 
   const paginatedCharacters = computed(() => {
-    if (!data.value) return [];
     const start = (currentPage.value - 1) * itemsPerPage;
     const end = start + itemsPerPage;
-    return data.value.slice(start, end);
+    return filteredCharacters.value.slice(start, end);
   });
 
   const displayedPages = computed(() => {
@@ -165,6 +166,4 @@
     }
     return pages;
   });
-
-  console.log(data.value);
 </script>
