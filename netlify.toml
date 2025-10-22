@@ -1,0 +1,10 @@
+[build]
+  command   = "npm run build"
+  publish   = ".output/public"
+  functions = ".netlify/functions-internal"
+
+# Forward all routes to the Nuxt server function
+[[redirects]]
+  from = "/*"
+  to   = "/.netlify/functions/server"
+  status = 200
