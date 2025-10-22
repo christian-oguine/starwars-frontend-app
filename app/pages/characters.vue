@@ -36,6 +36,15 @@
             Gender: {{ c.gender || '—' }}
           </p>
         </div>
+
+        <footer class="bg-white/[0.04] border-t border-white/10">
+          <NuxtLink
+            :to="`/details/${c.id}`"
+            class="block text-center text-sm text-gold font-poppins py-3 hover:bg-white/10 transition"
+          >
+            View Details
+          </NuxtLink>
+        </footer>
       </article>
     </div>
   </section>
