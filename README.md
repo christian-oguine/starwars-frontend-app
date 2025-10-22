@@ -1,75 +1,61 @@
-# Nuxt Minimal Starter
+# Star Wars Frontend App
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+A character browsing app for Star Wars fans. Built with Nuxt 3 and styled with Tailwind.
+
+## Tech Stack
+
+Started with Nuxt 4 because it handles routing and SSR out of the box. Added Tailwind for quick styling without writing tons of CSS.
+
+**Modules installed:**
+- `@nuxtjs/tailwindcss` - utility-first styling
+- `@nuxtjs/google-fonts` - loaded Cinzel and Poppins for that space opera vibe
+- `@nuxt/image` - optimized image loading
+- `@nuxt/icon` - easy icon management
+
+## Features
+
+- Browse all Star Wars characters
+- Search by name
+- Pagination (20 characters per page)
+- Responsive design
+
+## API
+
+Using the [Star Wars API](https://akabab.github.io/starwars-api/) for character data.
 
 ## Setup
 
-Make sure to install dependencies:
+Install dependencies:
 
 ```bash
-# npm
 npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
 ```
 
 ## Development Server
 
-Start the development server on `http://localhost:3000`:
+Run locally at `http://localhost:3000`:
 
 ```bash
-# npm
 npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
-
-Build the application for production:
+## Build
 
 ```bash
-# npm
 npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
 npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+## Project Structure
+
+```
+app/
+├── pages/
+│   ├── index.vue          # Homepage
+│   ├── characters.vue     # Character listing with search/filter
+│ 
+├── components/
+│   └── AppHeader.vue      # Navigation header
+
+```
+
