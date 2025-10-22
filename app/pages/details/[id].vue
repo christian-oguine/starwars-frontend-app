@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen w-full bg-[#0f1318] text-white flex flex-col fixed inset-0 text-offwhite overflow-hidden">
+  <div class="min-h-screen w-full bg-[#0f1318] text-offwhite">
     <!-- Top bar -->
     <section class="mx-auto w-full max-w-6xl px-6 pt-8">
       <div class="flex items-center justify-between gap-3">
@@ -11,22 +11,34 @@
           Back to Characters
         </NuxtLink>
 
-        <!-- Prev / Next -->
-        <div class="hidden sm:flex items-center gap-2">
+        <div class="flex items-center gap-3">
+          <!-- Team counter (always visible) -->
           <NuxtLink
-            v-if="prevId"
-            :to="`/details/${prevId}`"
+            to="/team"
             class="inline-flex items-center gap-2 rounded-lg px-3 py-2 border border-white/10 hover:border-gold/60 font-poppins text-sm transition"
+            title="Open My Team"
           >
-            <Icon name="ph:arrow-left" class="h-4 w-4" /> Prev
+            <Icon name="ph:users-three-duotone" class="w-4 h-4" />
+            Team {{ teamStore.size }}/{{ teamStore.max }}
           </NuxtLink>
-          <NuxtLink
-            v-if="nextId"
-            :to="`/details/${nextId}`"
-            class="inline-flex items-center gap-2 rounded-lg px-3 py-2 border border-white/10 hover:border-gold/60 font-poppins text-sm transition"
-          >
-            Next <Icon name="ph:arrow-right" class="h-4 w-4" />
-          </NuxtLink>
+
+          <!-- Prev / Next -->
+          <div class="hidden sm:flex items-center gap-2">
+            <NuxtLink
+              v-if="prevId"
+              :to="`/details/${prevId}`"
+              class="inline-flex items-center gap-2 rounded-lg px-3 py-2 border border-white/10 hover:border-gold/60 font-poppins text-sm transition"
+            >
+              <Icon name="ph:arrow-left" class="h-4 w-4" /> Prev
+            </NuxtLink>
+            <NuxtLink
+              v-if="nextId"
+              :to="`/details/${nextId}`"
+              class="inline-flex items-center gap-2 rounded-lg px-3 py-2 border border-white/10 hover:border-gold/60 font-poppins text-sm transition"
+            >
+              Next <Icon name="ph:arrow-right" class="h-4 w-4" />
+            </NuxtLink>
+          </div>
         </div>
       </div>
     </section>
@@ -54,7 +66,7 @@
                 @error="(e)=>(e.target as HTMLImageElement).src = placeholder"
               />
               <span
-                v-if="isEvil(character)"
+                v-if="evil"
                 class="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-red-500/15 border border-red-400/40 text-red-200 px-2.5 py-0.5 text-[12px] font-poppins"
               >
                 <Icon name="ph:warning-octagon-duotone" class="w-4 h-4" />
@@ -63,7 +75,7 @@
             </div>
           </div>
 
-          <!-- Quick facts -->
+          <!-- Quick facts + Add/Remove -->
           <div class="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4">
             <div class="space-y-2">
               <div class="flex items-center gap-2 text-sm font-poppins">
@@ -83,7 +95,7 @@
               </div>
             </div>
 
-            <div class="mt-4 flex flex-wrap gap-2">
+            <div class="mt-4 flex flex-wrap items-center gap-2">
               <a
                 v-if="character.wiki"
                 :href="character.wiki"
@@ -94,57 +106,54 @@
                 Wiki
               </a>
 
+              <!-- Add/Remove (block evil) -->
               <button
                 class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-poppins transition"
-                :class="isInTeam ? 'border border-white/10 hover:bg-white/10' : 'bg-gold text-black hover:brightness-110'"
+                :class="
+                  isInTeam
+                    ? 'border border-white/10 hover:bg-white/10'
+                    : evil
+                      ? 'border border-red-500/40 text-red-200/80 cursor-not-allowed'
+                      : (!teamStore.isFull ? 'bg-gold text-black hover:brightness-110' : 'border border-white/10 opacity-50 cursor-not-allowed')
+                "
+                :disabled="(!isInTeam && teamStore.isFull) || (!isInTeam && evil)"
                 @click="toggleTeam()"
-                :title="isInTeam ? 'Remove from Team' : 'Add to Team'"
+                :title="
+                  isInTeam
+                    ? 'Remove from Team'
+                    : evil
+                      ? 'Blocked: evil character cannot join'
+                      : (teamStore.isFull ? `Team is full (${teamStore.max})` : 'Add to Team')
+                "
               >
                 <Icon :name="isInTeam ? 'ph:user-minus-duotone' : 'ph:user-plus-duotone'" class="w-4 h-4" />
-                {{ isInTeam ? 'Remove from team' : 'Add to team' }}
+                {{ isInTeam ? 'Remove from team' : (evil ? 'Blocked' : 'Add to team') }}
               </button>
+
+              <span class="ml-auto text-xs text-white/60 font-poppins">
+                Team: {{ teamStore.size }}/{{ teamStore.max }}
+              </span>
             </div>
           </div>
         </aside>
 
-        <!-- RIGHT: Details -->
+        <!-- RIGHT: Details (unchanged structure) -->
         <main class="space-y-6">
-          <!-- Title block -->
           <header class="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
             <h1 class="font-cinzel text-3xl leading-tight">{{ character.name }}</h1>
             <p v-if="subtitle" class="mt-1 text-sm text-white/60 font-poppins">{{ subtitle }}</p>
           </header>
 
-          <!-- Stats -->
           <section class="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <div class="stat-card">
-              <p class="stat-label"><Icon name="ph:ruler-duotone" class="mr-1 inline h-4 w-4" /> Height</p>
-              <p class="stat-value">{{ character.height ?? '—' }}</p>
-            </div>
-            <div class="stat-card">
-              <p class="stat-label"><Icon name="ph:scales-duotone" class="mr-1 inline h-4 w-4" /> Mass</p>
-              <p class="stat-value">{{ character.mass ?? '—' }}</p>
-            </div>
-            <div class="stat-card">
-              <p class="stat-label"><Icon name="ph:baby-duotone" class="mr-1 inline h-4 w-4" /> Born</p>
-              <p class="stat-value">{{ character.born ?? '—' }}</p>
-            </div>
-            <div class="stat-card">
-              <p class="stat-label"><Icon name="ph:skull-duotone" class="mr-1 inline h-4 w-4" /> Died</p>
-              <p class="stat-value">{{ character.died ?? '—' }}</p>
-            </div>
-            <div class="stat-card">
-              <p class="stat-label"><Icon name="ph:map-pin-line-duotone" class="mr-1 inline h-4 w-4" /> Born at</p>
-              <p class="stat-value">{{ character.bornLocation || '—' }}</p>
-            </div>
+            <div class="stat-card"><p class="stat-label"><Icon name="ph:ruler-duotone" class="mr-1 inline h-4 w-4" /> Height</p><p class="stat-value">{{ character.height ?? '—' }}</p></div>
+            <div class="stat-card"><p class="stat-label"><Icon name="ph:scales-duotone" class="mr-1 inline h-4 w-4" /> Mass</p><p class="stat-value">{{ character.mass ?? '—' }}</p></div>
+            <div class="stat-card"><p class="stat-label"><Icon name="ph:baby-duotone" class="mr-1 inline h-4 w-4" /> Born</p><p class="stat-value">{{ character.born ?? '—' }}</p></div>
+            <div class="stat-card"><p class="stat-label"><Icon name="ph:skull-duotone" class="mr-1 inline h-4 w-4" /> Died</p><p class="stat-value">{{ character.died ?? '—' }}</p></div>
+            <div class="stat-card"><p class="stat-label"><Icon name="ph:map-pin-line-duotone" class="mr-1 inline h-4 w-4" /> Born at</p><p class="stat-value">{{ character.bornLocation || '—' }}</p></div>
           </section>
 
-          <!-- More facts -->
           <section class="panel">
-            <h3 class="panel-title">
-              <Icon name="ph:list-bullets-duotone" class="mr-2 inline h-5 w-5 text-gold" />
-              Facts
-            </h3>
+            <h3 class="panel-title"><Icon name="ph:list-bullets-duotone" class="mr-2 inline h-5 w-5 text-gold" /> Facts</h3>
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 text-sm font-poppins">
               <div class="fact"><span class="label">Died at:</span> <span>{{ character.diedLocation || '—' }}</span></div>
               <div class="fact"><span class="label">Eye color:</span> <span class="capitalize">{{ character.eyeColor || '—' }}</span></div>
@@ -154,53 +163,26 @@
             </div>
           </section>
 
-          <!-- Affiliations / Masters / Apprentices -->
           <section class="grid md:grid-cols-2 gap-4">
             <div v-if="hasAffiliations" class="panel">
-              <h3 class="panel-title">
-                <Icon name="ph:users-three-duotone" class="mr-2 inline h-5 w-5 text-gold" />
-                Affiliations
-              </h3>
-              <ul class="list">
-                <li v-for="(a,i) in character.affiliations" :key="i">{{ a }}</li>
-              </ul>
+              <h3 class="panel-title"><Icon name="ph:users-three-duotone" class="mr-2 inline h-5 w-5 text-gold" /> Affiliations</h3>
+              <ul class="list"><li v-for="(a,i) in character.affiliations" :key="i">{{ a }}</li></ul>
             </div>
-
             <div v-if="hasMasters" class="panel">
-              <h3 class="panel-title">
-                <Icon name="ph:sword-duotone" class="mr-2 inline h-5 w-5 text-gold" />
-                Masters
-              </h3>
-              <ul class="list">
-                <li v-for="(m,i) in character.masters" :key="i">{{ m }}</li>
-              </ul>
+              <h3 class="panel-title"><Icon name="ph:sword-duotone" class="mr-2 inline h-5 w-5 text-gold" /> Masters</h3>
+              <ul class="list"><li v-for="(m,i) in character.masters" :key="i">{{ m }}</li></ul>
             </div>
-
             <div v-if="hasApprentices" class="panel md:col-span-2">
-              <h3 class="panel-title">
-                <Icon name="ph:graduation-cap-duotone" class="mr-2 inline h-5 w-5 text-gold" />
-                Apprentices
-              </h3>
-              <ul class="list">
-                <li v-for="(p,i) in character.apprentices" :key="i">{{ p }}</li>
-              </ul>
+              <h3 class="panel-title"><Icon name="ph:graduation-cap-duotone" class="mr-2 inline h-5 w-5 text-gold" /> Apprentices</h3>
+              <ul class="list"><li v-for="(p,i) in character.apprentices" :key="i">{{ p }}</li></ul>
             </div>
           </section>
 
-          <!-- Bottom Prev/Next for mobile -->
           <div class="sm:hidden flex items-center justify-between">
-            <NuxtLink
-              v-if="prevId"
-              :to="`/details/${prevId}`"
-              class="inline-flex items-center gap-2 rounded-lg px-3 py-2 border border-white/10 hover:border-gold/60 font-poppins text-sm transition"
-            >
+            <NuxtLink v-if="prevId" :to="`/details/${prevId}`" class="inline-flex items-center gap-2 rounded-lg px-3 py-2 border border-white/10 hover:border-gold/60 font-poppins text-sm transition">
               <Icon name="ph:arrow-left" class="h-4 w-4" /> Prev
             </NuxtLink>
-            <NuxtLink
-              v-if="nextId"
-              :to="`/details/${nextId}`"
-              class="inline-flex items-center gap-2 rounded-lg px-3 py-2 border border-white/10 hover:border-gold/60 font-poppins text-sm transition"
-            >
+            <NuxtLink v-if="nextId" :to="`/details/${nextId}`" class="inline-flex items-center gap-2 rounded-lg px-3 py-2 border border-white/10 hover:border-gold/60 font-poppins text-sm transition">
               Next <Icon name="ph:arrow-right" class="h-4 w-4" />
             </NuxtLink>
           </div>
@@ -212,6 +194,7 @@
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
+import { useMyTeamStore, isEvilCharacter } from '~~/stores/team'
 
 type Character = {
   id: number
@@ -246,7 +229,7 @@ const { data, pending, error } = await useFetch<Character>(
 )
 const character = computed(() => data.value ?? null)
 
-// fetch all ids (for prev/next). Cache with a stable key.
+// prev/next
 const { data: allList } = await useFetch<any[]>(
   'https://akabab.github.io/starwars-api/api/all.json',
   { default: () => [], key: 'sw-all' }
@@ -256,24 +239,31 @@ const idx = computed(() => ids.value.findIndex(x => x === id.value))
 const prevId = computed(() => (idx.value > 0 ? ids.value[idx.value - 1] : null))
 const nextId = computed(() => (idx.value >= 0 && idx.value < ids.value.length - 1 ? ids.value[idx.value + 1] : null))
 
-// team (persisted)
-const team = useState<number[]>('team', () => {
-  if (process.client) {
-    try { return JSON.parse(localStorage.getItem('team') || '[]') } catch { return [] }
-  }
-  return []
-})
-watch(team, (val) => { if (process.client) localStorage.setItem('team', JSON.stringify(val)) }, { deep: true })
+// team
+const teamStore = useMyTeamStore()
+onMounted(() => teamStore.load())
 
-const isInTeam = computed(() => team.value.includes(id.value))
+const isInTeam = computed(() => teamStore.isInTeam(id.value))
+const evil = computed(() => character.value ? isEvilCharacter(character.value) : false)
+
 function toggleTeam() {
-  const arr = team.value
-  const i = arr.indexOf(id.value)
-  if (i >= 0) arr.splice(i, 1)
-  else arr.push(id.value)
+  if (!character.value) return
+  if (!isInTeam.value && evil.value) return // hard block in UI too
+
+  const result = teamStore.toggle({
+    id: character.value.id,
+    name: character.value.name,
+    image: character.value.image,
+    gender: character.value.gender,
+    affiliations: character.value.affiliations,
+    masters: character.value.masters
+  })
+
+  if ((result as any)?.reason === 'TEAM_FULL') {
+    alert(`Team is full (${teamStore.max}). Remove a member first.`)
+  }
 }
 
-// helpers
 const placeholder =
   'https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=1200&auto=format&fit=crop'
 
@@ -282,18 +272,10 @@ const subtitle = computed(() => {
   return parts.length ? parts.join(' • ') : ''
 })
 
-const isEvil = (c: Partial<Character>) => {
-  const t = (s: any) => String(s || '').toLowerCase()
-  return /(darth|sith|first order|empire)/.test(t(c.name)) ||
-         /(darth|sith|first order|empire)/.test(t((c.affiliations || []).join(' '))) ||
-         /(darth)/.test(t((c.masters || []).join(' ')))
-}
-
 const hasAffiliations = computed(() => Array.isArray(character.value?.affiliations) && character.value!.affiliations!.length > 0)
 const hasMasters = computed(() => Array.isArray(character.value?.masters) && character.value!.masters!.length > 0)
 const hasApprentices = computed(() => Array.isArray(character.value?.apprentices) && character.value!.apprentices!.length > 0)
 
-// SEO
 useHead(() => ({
   title: character.value ? `${character.value.name} • Details` : 'Character Details'
 }))
