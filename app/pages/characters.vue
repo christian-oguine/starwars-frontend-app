@@ -109,6 +109,30 @@
 <script setup lang="ts">
   const {data, error} = await useFetch('https://akabab.github.io/starwars-api/api/all.json');
 
+
+  // Search state
+  const searchQuery = ref('');
+
+  const handleCharacterSearch = () => {
+    if (!data.value) return;
+
+    const query = searchQuery.value.trim().toLowerCase();
+    if (query === '') {
+      // If search query is empty, reload all characters
+      return;
+    }
+
+    // Filter characters by name
+    data.value = data.value.filter((character: any) =>
+      character.name.toLowerCase().includes(query)
+    );
+
+    // Reset to first page after search
+    currentPage.value = 1;
+  };
+
+  
+
   // Pagination state
   const currentPage = ref(1);
   const itemsPerPage = 12;
