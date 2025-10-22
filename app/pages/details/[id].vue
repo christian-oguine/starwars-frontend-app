@@ -101,7 +101,7 @@
                 :title="isInTeam ? 'Remove from Team' : 'Add to Team'"
               >
                 <Icon :name="isInTeam ? 'ph:user-minus-duotone' : 'ph:user-plus-duotone'" class="w-4 h-4" />
-                {{ isInTeam ? 'Remove' : 'Add' }}
+                {{ isInTeam ? 'Remove from team' : 'Add to team' }}
               </button>
             </div>
           </div>
