@@ -12,7 +12,7 @@ export default defineNuxtConfig({
       title: 'Star Wars Characters App',
       meta: [
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { hid: 'description', name: 'description', content: 'A Star Wars characters management application built with Nuxt 3 and Pinia.' },
+        { name: 'description', content: 'A Star Wars characters management application built with Nuxt and Pinia.' },
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
