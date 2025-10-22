@@ -205,6 +205,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import { useMyTeamStore, isEvilCharacter } from '~~/stores/team'
+import { API_ENDPOINTS } from '~~/utils/api'
 
 type Character = {
   id: number
@@ -234,14 +235,14 @@ const id = computed(() => Number(route.params.id))
 
 // single character
 const { data, pending, error } = await useFetch<Character>(
-  () => `https://akabab.github.io/starwars-api/api/id/${id.value}.json`,
-  { key: () => `character-${id.value}`, default: () => null }
+  () => API_ENDPOINTS.characterById(id.value),
+  { key: `sw-character-${id.value}` }
 )
 const character = computed(() => data.value ?? null)
 
 // prev/next
 const { data: allList } = await useFetch<any[]>(
-  'https://akabab.github.io/starwars-api/api/all.json',
+  API_ENDPOINTS.allCharacters,
   { default: () => [], key: 'sw-all' }
 )
 const ids = computed<number[]>(() => (allList.value || []).map((x: any) => x.id).sort((a,b)=>a-b))
