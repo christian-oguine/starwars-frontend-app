@@ -107,7 +107,8 @@
 </template>
 
 <script setup lang="ts">
-  const {data, error} = await useFetch('https://akabab.github.io/starwars-api/api/all.json');
+  import { API_ENDPOINTS } from '~~/utils/api'
+  const {data, error} = await useFetch(API_ENDPOINTS.allCharacters);
 
   // Search state
   const searchQuery = ref('');
