@@ -135,9 +135,33 @@ const subtitle = computed(() => {
   return parts.length ? parts.join(' • ') : ''
 })
 
+// Simple “evil” rule
+const isEvil = (c: Partial<Character>) => {
+  const t = (s: any) => String(s || '').toLowerCase()
+  return /(darth|sith)/.test(t(c.name)) ||
+         /(darth|sith)/.test(t((c.affiliations || []).join(' '))) ||
+         /(darth)/.test(t((c.masters || []).join(' ')))
+}
 
+const hasAffiliations = computed(
+  () => Array.isArray(character.value?.affiliations) && character.value!.affiliations!.length > 0
+)
+const hasMasters = computed(
+  () => Array.isArray(character.value?.masters) && character.value!.masters!.length > 0
+)
+
+// SEO
+useHead(() => ({
+  title: character.value ? `${character.value.name} • Details` : 'Character Details'
+}))
 </script>
 
 <style scoped>
+.stat-card { @apply rounded-2xl border border-white/10 bg-white/[0.04] p-4; }
+.stat-label { @apply text-xs font-poppins text-white/60; }
+.stat-value { @apply mt-1 text-lg font-cinzel; }
 
+.panel { @apply rounded-2xl border border-white/10 bg-white/[0.04] p-5; }
+.panel-title { @apply font-cinzel text-xl mb-2; }
+.list { @apply space-y-1 text-sm font-poppins text-white/85 pl-1; }
 </style>
