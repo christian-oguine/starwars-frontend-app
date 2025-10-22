@@ -7,6 +7,23 @@
       <p class="font-poppins text-white/70">Browse the roster.</p>
     </section>
 
+    <!-- Search Bar -->
+    <section class="mx-auto w-full max-w-6xl px-6 pb-4">
+      <input
+        type="text"
+        v-model="searchQuery"
+        placeholder="Search characters by name..."
+        class="w-full p-2 border border-white/10 rounded-lg bg-transparent text-white"
+        @keyup.enter="handleCharacterSearch"
+      />
+      <button
+        @click="handleCharacterSearch"
+        class="mt-2 px-4 py-2 bg-gold text-black rounded-lg font-poppins hover:brightness-110 transition"
+      >
+        Search
+      </button>
+    </section>
+
   <!-- GRID -->
   <section class="mx-auto w-full max-w-6xl px-6 pb-10">
     <!-- error state -->
