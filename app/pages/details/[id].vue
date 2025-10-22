@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen w-full bg-[#0f1318] text-offwhite">
+  <div class="min-h-screen w-full bg-[#0f1318] text-white flex flex-col fixed inset-0 text-offwhite overflow-hidden">
     <!-- Top bar -->
     <section class="mx-auto w-full max-w-6xl px-6 pt-8">
       <div class="flex items-center justify-between gap-3">
